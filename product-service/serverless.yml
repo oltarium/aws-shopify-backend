@@ -24,7 +24,7 @@ provider:
   environment:
     AWS_NODEJS_CONNECTION_REUSE_ENABLES: 1
 functions:
-  getProductList:
+  getProductsList:
     handler: src/handlers/getProductsList/handler.getProductsList
     events:
       - http:
@@ -39,7 +39,7 @@ functions:
                   description: Array of products
                 responseModels:
                   application/json: GetProductsListResponse
-  getProductListById:
+  getProductById:
     handler: src/handlers/getProductById/handler.getProductById
     events:
       - http:
