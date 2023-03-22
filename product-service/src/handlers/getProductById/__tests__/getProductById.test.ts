@@ -1,6 +1,6 @@
 import {getProductById} from '../handler';
 import {APIGatewayProxyEvent} from "aws-lambda";
-import {data} from "../mock";
+import {data} from "../../mock";
 
 describe('[getProductById]', () => {
     it('should return 400 code if productId is not number', async () => {

@@ -8,10 +8,25 @@ custom:
     includeModules: true
     excludeFiles: src/**/*.test.js # Provide a glob for files to ignore
   documentation: ${file(serverless.doc.yml):documentation}
+  productsTableName: 'products-table'
+  stocksTableName: "stocks-table"
+  dynamodb:
+    # If you only want to use DynamoDB Local in some stages, declare them here
+    stages:
+      - dev
+    start:
+      port: 6000
+      inMemory: true
+      heapInitial: 200m
+      heapMax: 1g
+      migrate: true
+      seed: true
+      convertEmptyValues: true
 plugins:
   - serverless-better-credentials
   - serverless-webpack
   - serverless-openapi-documenter
+  - serverless-dynamodb-local
 package:
   individually: true
 provider:
@@ -23,8 +38,44 @@ provider:
   memorySize: 128
   environment:
     AWS_NODEJS_CONNECTION_REUSE_ENABLES: 1
+    PRODUCTS_TABLE: ${self:custom.productsTableName}
+    STOCKS_TABLE: ${self:custom.stocksTableName}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - "Fn::GetAtt": [ ProductsTable, Arn ]
+        - Effect: Allow
+          Action:
+            - dynamodb:DescribeTable
+            - dynamodb:Query
+            - dynamodb:Scan
+            - dynamodb:GetItem
+            - dynamodb:PutItem
+            - dynamodb:UpdateItem
+            - dynamodb:DeleteItem
+          Resource:
+            - "Fn::GetAtt": [ StocksTable, Arn ]
 functions:
-  getProductList:
+  createProduct:
+    handler: src/handlers/createProduct/handler.createProduct
+    events:
+      - http:
+          method: post
+          path: products
+          documentation:
+            summary: Create a new product
+            description: OK
+  getProductsList:
     handler: src/handlers/getProductsList/handler.getProductsList
     events:
       - http:
@@ -39,7 +90,7 @@ functions:
                   description: Array of products
                 responseModels:
                   application/json: GetProductsListResponse
-  getProductListById:
+  getProductById:
     handler: src/handlers/getProductById/handler.getProductById
     events:
       - http:
@@ -65,8 +116,33 @@ functions:
                   description: Not found error
                 responseModels:
                   application/json: GetProductErrorResponse
-
           request:
             parameters:
               paths:
                 productId: true
+
+resources:
+  Resources:
+    ProductsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.productsTableName}
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: N
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+
+    StocksTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.stocksTableName}
+        AttributeDefinitions:
+          - AttributeName: product_id
+            AttributeType: N
+        KeySchema:
+          - AttributeName: product_id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
