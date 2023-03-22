@@ -5,3 +5,4 @@ admin.env
 _meta
 .serverless
 .dynamodb
+.webpack
