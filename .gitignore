@@ -1,0 +1,6 @@
+node_modules
+.idea
+admin.env
+.env
+_meta
+.serverless
