@@ -41,17 +41,17 @@ export const importFileParser = async (event: S3Event, context: Context, callbac
 }
 
 async function moveFile(s3: S3, bucket: string, file: string) {
+    const [_, fileName] = file.split('/');
     const sourceFolder = 'uploaded'
     const destFolder = 'parsed'
     const s3Params = {
         Bucket: bucket,
-        CopySource: `${bucket}/${sourceFolder}/${file}`,
-        Key: `${destFolder}/${file}`
+        CopySource: `${bucket}/${sourceFolder}/${fileName}`,
+        Key: `${destFolder}/${fileName}`
     };
-    console.log(s3Params)
     try {
         await s3.copyObject(s3Params).promise();
-        await s3.deleteObject({Bucket: bucket, Key: `${sourceFolder}/${file}`}).promise();
+        await s3.deleteObject({Bucket: bucket, Key: `${sourceFolder}/${fileName}`}).promise();
     } catch (ex) {
         console.error(`Failed: ${ex}`)
     }
