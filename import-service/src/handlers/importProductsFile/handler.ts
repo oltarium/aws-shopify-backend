@@ -1,5 +1,6 @@
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from "aws-lambda";
-import {S3} from "aws-sdk";
+import {S3Client, PutObjectCommand} from "@aws-sdk/client-s3";
+import {getSignedUrl} from './my-s3-client-internals';
 
 export const importProductsFile = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const {REGION: region, BUCKET: bucket} = process.env;
@@ -8,8 +9,8 @@ export const importProductsFile = async (event: APIGatewayProxyEvent): Promise<A
     }
 
     const file = event.queryStringParameters
-            ? event.queryStringParameters['name']
-            : undefined;
+        ? event.queryStringParameters['name']
+        : undefined;
 
     if (!file) {
         return {
@@ -23,33 +24,20 @@ export const importProductsFile = async (event: APIGatewayProxyEvent): Promise<A
             }),
         };
     }
-
-    const params = {
+    const client = new S3Client({region: region});
+    const command = new PutObjectCommand({
         Bucket: bucket,
         Key: "uploaded/" + file,
-        Expires: 30,
+    });
+    const url = await getSignedUrl(client, command, {expiresIn: 3600});
+
+    return {
+        statusCode: 200,
+        headers: {
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Credentials': true,
+        },
+        body: JSON.stringify(url),
     };
 
-    try {
-        const s3 = new S3({signatureVersion: 'v4', region});
-        const url = s3.getSignedUrl('putObject', params);
-
-        return {
-            statusCode: 200,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': true,
-            },
-            body: JSON.stringify(url),
-        };
-    } catch (error) {
-        return {
-            statusCode: 400,
-            headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Credentials': true,
-            },
-            body: JSON.stringify(error),
-        };
-    }
 }
