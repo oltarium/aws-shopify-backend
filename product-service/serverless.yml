@@ -1,0 +1,72 @@
+service: product-service
+
+frameworkVersion: "3"
+
+custom:
+  webpack:
+    webpackConfig: webpack.config.js
+    includeModules: true
+    excludeFiles: src/**/*.test.js # Provide a glob for files to ignore
+  documentation: ${file(serverless.doc.yml):documentation}
+plugins:
+  - serverless-better-credentials
+  - serverless-webpack
+  - serverless-openapi-documenter
+package:
+  individually: true
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  apiGateway:
+    minimumCompressionSize: 1024
+  memorySize: 128
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLES: 1
+functions:
+  getProductsList:
+    handler: src/handlers/getProductsList/handler.getProductsList
+    events:
+      - http:
+          method: get
+          path: products
+          documentation:
+            summary: Return list of Products
+            description: OK
+            methodResponses:
+              - statusCode: 200
+                responseBody:
+                  description: Array of products
+                responseModels:
+                  application/json: GetProductsListResponse
+  getProductById:
+    handler: src/handlers/getProductById/handler.getProductById
+    events:
+      - http:
+          method: get
+          path: products/{productId}
+          documentation:
+            summary: Return a product by ID
+            description: OK
+            pathParams:
+              - name: productId
+                description: Product Id
+                schema:
+                  type: integer
+                  pattern: "^[0-9]+$"
+            methodResponses:
+              - statusCode: 200
+                responseBody:
+                  description: Product with specified id
+                responseModels:
+                  application/json: GetProductResponse
+              - statusCode: 404
+                responseBody:
+                  description: Not found error
+                responseModels:
+                  application/json: GetProductErrorResponse
+
+          request:
+            parameters:
+              paths:
+                productId: true

@@ -1,0 +1,49 @@
+documentation:
+  version: '1'
+  title: 'Fishing shop api'
+  description: 'This is fishing API'
+  models:
+    - name: "GetProductErrorResponse"
+      description: ""
+      contentType: "application/json"
+      schema:
+        $schema: "http://json-schema.org/draft-04/schema#"
+        properties:
+          message:
+            type: string
+    - name: "GetProductsListResponse"
+      description: "GET Product response model"
+      contentType: "application/json"
+      schema:
+        $schema: "http://json-schema.org/draft-04/schema#"
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: integer
+            title:
+              type: string
+            description:
+              type: string
+            count:
+              type: integer
+            price:
+              type: integer
+    - name: "GetProductResponse"
+      description: "GET Product response model"
+      contentType: "application/json"
+      schema:
+        $schema: "http://json-schema.org/draft-04/schema#"
+        type: object
+        properties:
+          id:
+            type: integer
+          title:
+            type: string
+          description:
+            type: string
+          count:
+            type: integer
+          price:
+            type: integer
