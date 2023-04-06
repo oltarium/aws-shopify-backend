@@ -12,7 +12,8 @@
     "dynamodb:startlocal": "SET AWS_SDK_LOAD_CONFIG=1 && sls dynamodb start"
   },
   "dependencies": {
-    "aws-sdk": "^2.1340.0"
+    "aws-sdk": "^2.1340.0",
+    "uuid": "^9.0.0"
   },
   "devDependencies": {
     "aws-lambda": "^1.0.7",

@@ -1,4 +1,6 @@
 import {APIGatewayProxyEvent, APIGatewayProxyResult} from 'aws-lambda';
+// @ts-ignore
+import { v4 as uuidv4 } from 'uuid';
 
 const {DynamoDB} = require("aws-sdk");
 
@@ -49,12 +51,7 @@ export const createProduct = async (event: APIGatewayProxyEvent): Promise<APIGat
 
     try {
         const db = new DynamoDB.DocumentClient();
-        const {Count: count = 0} = await db.scan({
-            // @ts-ignore
-            TableName: process.env.PRODUCTS_TABLE,
-            Select: "COUNT",
-        }).promise();
-        const newId = count + 1;
+        const newId = uuidv4();
         const newProduct: Omit<ProductBody, "count"> = {
             id: newId,
             title: body.title,

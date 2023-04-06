@@ -1,7 +1,7 @@
 service: product-service
 
 frameworkVersion: "3"
-
+useDotenv: true
 custom:
   webpack:
     webpackConfig: webpack.config.js
@@ -11,7 +11,6 @@ custom:
   productsTableName: 'products-table'
   stocksTableName: "stocks-table"
   dynamodb:
-    # If you only want to use DynamoDB Local in some stages, declare them here
     stages:
       - dev
     start:
@@ -22,6 +21,14 @@ custom:
       migrate: true
       seed: true
       convertEmptyValues: true
+  USERNAME: ${env:USERNAME}
+  DB_NAME: ${env:DB_NAME}
+  PASSWORD: ${env:PASSWORD}
+  POSTGRESQL:
+    HOST:
+      Fn::GetAtt: [ PostgreSqlRDSInstance, Endpoint.Address ]
+    PORT:
+      Fn::GetAtt: [ PostgreSqlRDSInstance, Endpoint.Port ]
 plugins:
   - serverless-better-credentials
   - serverless-webpack
@@ -43,6 +50,13 @@ provider:
   iam:
     role:
       statements:
+        - Effect: Allow
+          Action:
+            - "rds:connect"
+            - "rds:CreateDBInstance"
+            - "rds:ModifyDBInstance"
+          Resource:
+            - "Fn::GetAtt": [ ProductsTable, Arn ]
         - Effect: Allow
           Action:
             - dynamodb:DescribeTable
@@ -123,6 +137,8 @@ functions:
 
 resources:
   Resources:
+    PostgreSqlRDSInstance: ${file(./PostgreSqlRDSInstance.yml)}
+
     ProductsTable:
       Type: AWS::DynamoDB::Table
       Properties:
