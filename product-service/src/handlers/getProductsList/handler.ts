@@ -4,12 +4,13 @@ const {DynamoDB} = require("aws-sdk");
 export const getProductsList = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const log = `
         Method: ${event.httpMethod}, 
-        Function: createProduct, 
-        Path Parameters: ${event.pathParameters}, 
-        Query Parameters: ${event.queryStringParameters},
-        Body: ${event.body}
+        Function: getProductsList, 
+        Path Parameters: ${JSON.stringify(event.pathParameters)}, 
+        Query Parameters: ${JSON.stringify(event.queryStringParameters)},
+        Body: ${JSON.stringify(event.body)}
     `;
     console.log(log);
+    console.log(JSON.stringify(process.env));
     try {
         const db = new DynamoDB.DocumentClient()
 

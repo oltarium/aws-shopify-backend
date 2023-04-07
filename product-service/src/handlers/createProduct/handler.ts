@@ -16,11 +16,12 @@ export const createProduct = async (event: APIGatewayProxyEvent): Promise<APIGat
     const log = `
         Method: ${event.httpMethod}, 
         Function: createProduct, 
-        Path Parameters: ${event.pathParameters}, 
-        Query Parameters: ${event.queryStringParameters},
-        Body: ${event.body}
+        Path Parameters: ${JSON.stringify(event.pathParameters)}, 
+        Query Parameters: ${JSON.stringify(event.queryStringParameters)},
+        Body: ${JSON.stringify(event.body)}
     `;
     console.log(log);
+    console.log(JSON.stringify(process.env));
     if (event.body === null) {
         return {
             statusCode: 400,

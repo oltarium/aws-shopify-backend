@@ -8,8 +8,8 @@ custom:
     includeModules: true
     excludeFiles: src/**/*.test.js # Provide a glob for files to ignore
   documentation: ${file(serverless.doc.yml):documentation}
-  productsTableName: 'products-table'
-  stocksTableName: "stocks-table"
+  productsTableName: 'products'
+  stocksTableName: "stocks"
   dynamodb:
     stages:
       - dev
@@ -21,14 +21,10 @@ custom:
       migrate: true
       seed: true
       convertEmptyValues: true
-  USERNAME: ${env:USERNAME}
-  DB_NAME: ${env:DB_NAME}
-  PASSWORD: ${env:PASSWORD}
-  POSTGRESQL:
-    HOST:
-      Fn::GetAtt: [ PostgreSqlRDSInstance, Endpoint.Address ]
-    PORT:
-      Fn::GetAtt: [ PostgreSqlRDSInstance, Endpoint.Port ]
+  DATABASE_USERNAME: ${env:DATABASE_USERNAME}
+  DATABASE_PASSWORD: ${env:DATABASE_PASSWORD}
+  DATABASE_NAME: ${env:DB_NAME}
+
 plugins:
   - serverless-better-credentials
   - serverless-webpack
@@ -47,6 +43,12 @@ provider:
     AWS_NODEJS_CONNECTION_REUSE_ENABLES: 1
     PRODUCTS_TABLE: ${self:custom.productsTableName}
     STOCKS_TABLE: ${self:custom.stocksTableName}
+    POSTGRESQL_HOST: !GetAtt PostgreSqlRDSInstance.Endpoint.Address
+    POSTGRESQL_PORT: !GetAtt PostgreSqlRDSInstance.Endpoint.Port
+    DATABASE_USERNAME: ${self:custom.DATABASE_USERNAME}
+    DATABASE_PASSWORD: ${self:custom.DATABASE_PASSWORD}
+    DATABASE_NAME: ${self:custom.DATABASE_NAME}
+
   iam:
     role:
       statements:
@@ -55,8 +57,12 @@ provider:
             - "rds:connect"
             - "rds:CreateDBInstance"
             - "rds:ModifyDBInstance"
+            - "rds:DeleteDBInstance"
           Resource:
-            - "Fn::GetAtt": [ ProductsTable, Arn ]
+            Fn::Join:
+              - ''
+              - - 'arn:aws:rds:::'
+                - Ref: PostgreSqlRDSInstance
         - Effect: Allow
           Action:
             - dynamodb:DescribeTable
@@ -137,10 +143,23 @@ functions:
 
 resources:
   Resources:
-    PostgreSqlRDSInstance: ${file(./PostgreSqlRDSInstance.yml)}
+    PostgreSqlRDSInstance:
+      Type: AWS::RDS::DBInstance
+      DeletionPolicy: Retain
+      UpdateReplacePolicy: Retain
+      Properties:
+        MasterUsername: ${self:custom.DATABASE_USERNAME}
+        MasterUserPassword: ${self:custom.DATABASE_PASSWORD}
+        DBName: ${self:custom.DATABASE_NAME}
+        AllocatedStorage: 5
+        DBInstanceClass: db.t3.micro
+        Engine: postgres
+        PubliclyAccessible: true
 
     ProductsTable:
       Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      UpdateReplacePolicy: Retain
       Properties:
         TableName: ${self:custom.productsTableName}
         AttributeDefinitions:
@@ -153,6 +172,8 @@ resources:
 
     StocksTable:
       Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      UpdateReplacePolicy: Retain
       Properties:
         TableName: ${self:custom.stocksTableName}
         AttributeDefinitions:

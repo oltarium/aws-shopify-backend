@@ -4,10 +4,10 @@ const {DynamoDB} = require("aws-sdk");
 export const getProductById = async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const log = `
         Method: ${event.httpMethod}, 
-        Function: createProduct, 
-        Path Parameters: ${event.pathParameters}, 
-        Query Parameters: ${event.queryStringParameters},
-        Body: ${event.body}
+        Function: getProductById, 
+        Path Parameters: ${JSON.stringify(event.pathParameters)}, 
+        Query Parameters: ${JSON.stringify(event.queryStringParameters)},
+        Body: ${JSON.stringify(event.body)}
     `;
     console.log(log);
     const productId = Number(event.pathParameters?.productId);
