@@ -158,13 +158,13 @@ resources:
 
     ProductsTable:
       Type: AWS::DynamoDB::Table
-      DeletionPolicy: Retain
-      UpdateReplacePolicy: Retain
+      DeletionPolicy: Delete
+      UpdateReplacePolicy: Snapshot
       Properties:
         TableName: ${self:custom.productsTableName}
         AttributeDefinitions:
           - AttributeName: id
-            AttributeType: N
+            AttributeType: S
         KeySchema:
           - AttributeName: id
             KeyType: HASH
@@ -172,13 +172,13 @@ resources:
 
     StocksTable:
       Type: AWS::DynamoDB::Table
-      DeletionPolicy: Retain
-      UpdateReplacePolicy: Retain
+      DeletionPolicy: Delete
+      UpdateReplacePolicy: Snapshot
       Properties:
         TableName: ${self:custom.stocksTableName}
         AttributeDefinitions:
           - AttributeName: product_id
-            AttributeType: N
+            AttributeType: S
         KeySchema:
           - AttributeName: product_id
             KeyType: HASH

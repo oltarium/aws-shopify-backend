@@ -34,23 +34,23 @@
   "stocks": [
     {
       "product_id": 1,
-      "count": "5"
+      "count": 6
     },
     {
       "product_id": 2,
-      "count": "5"
+      "count": 57
     },
     {
       "product_id": 3,
-      "count": "5"
+      "count": 54
     },
     {
       "product_id": 4,
-      "count": "5"
+      "count": 51
     },
     {
       "product_id": 5,
-      "count": "5"
+      "count": 3
     }
   ]
 }

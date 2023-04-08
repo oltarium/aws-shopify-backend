@@ -1,49 +1,58 @@
 import * as dotenv from 'dotenv';
-dotenv.config();
-import { createRequire } from "module";
+import {createRequire} from "module";
+import {v4 as uuidv4} from 'uuid';
+import {DynamoDBClient, TransactWriteItemsCommand} from "@aws-sdk/client-dynamodb";
+
 const require = createRequire(import.meta.url);
 const data = require("./products.json");
-console.log(process.env.AWS_SDK_LOAD_CONFIG)
+
 // @ts-ignore
-import {v4 as uuidv4} from 'uuid';
+dotenv.config();
 
-const {DynamoDB} = require("aws-sdk");
-const db = new DynamoDB.DocumentClient({
+const db = new DynamoDBClient({
     region: process.env.REGION,
-
 });
+
 async function init() {
     for (let i = 0; i < data.products.length; i++) {
         const prod = data.products[i];
         const newId = uuidv4();
         const newProduct = {
-            id: newId,
-            title: prod.title,
-            description: prod.description,
-            price: prod.price,
+            id: {S: newId},
+            title: {S: prod.title},
+            description: {S: prod.description},
+            price: {N: `${prod.price}`},
         }
-        await db.transactWrite({
-            TransactItems: [
-                {
-                    Put: {
-                        // @ts-ignore
-                        TableName: process.env.PRODUCTS_TABLE,
-                        Item: newProduct,
-                    },
-                },
-                {
-                    Put: {
-                        // @ts-ignore
-                        TableName: process.env.STOCKS_TABLE,
-                        Item: {
+        const newStock = {
+            product_id: {S: newId},
+            count: {N: `${data.stocks[i].count}`},
+        }
+        try {
+            await db.send(new TransactWriteItemsCommand({
+                ReturnItemCollectionMetrics: 'NONE',
+                ReturnConsumedCapacity: 'TOTAL',
+                ClientRequestToken: `Tokey=${i}`,
+                TransactItems: [
+                    {
+                        Put: {
                             // @ts-ignore
-                            product_id: newId,
-                            count: data.stocks[i].count,
+                            TableName: process.env.PRODUCTS_TABLE,
+                            Item: newProduct,
                         },
                     },
-                },
-            ],
-        }).promise();
+                    {
+                        Put: {
+                            // @ts-ignore
+                            TableName: process.env.STOCKS_TABLE,
+                            Item: newStock,
+                        },
+                    },
+                ],
+            }));
+        } catch (e) {
+            console.error(e);
+        }
     }
 }
-init();
+
+await init();
