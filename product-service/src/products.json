@@ -1,0 +1,58 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "title": "Fishing Rod",
+      "description": "Perfect rod from bambook",
+      "price": 15
+    },
+    {
+      "id": 2,
+      "title": "Fishing chair",
+      "description": "Comfortable chair",
+      "price": 50
+    },
+    {
+      "id": 3,
+      "title": "Fishing home",
+      "description": "Roomy fishing home",
+      "price": 600
+    },
+    {
+      "id": 4,
+      "title": "Bread",
+      "description": "Simple bread",
+      "price": 1
+    },
+    {
+      "id": 5,
+      "title": "Bait",
+      "description": "Aroma fish food",
+      "price": 6
+    }
+  ],
+  "stocks": [
+    {
+      "product_id": 1,
+      "count": 6
+    },
+    {
+      "product_id": 2,
+      "count": 57
+    },
+    {
+      "product_id": 3,
+      "count": 54
+    },
+    {
+      "product_id": 4,
+      "count": 51
+    },
+    {
+      "product_id": 5,
+      "count": 3
+    }
+  ]
+}
+
+
