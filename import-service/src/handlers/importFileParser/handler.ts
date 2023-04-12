@@ -4,7 +4,7 @@ import csv from 'csv-parser';
 import type {Readable} from 'stream'
 
 export const importFileParser = async (event: S3Event, context: Context, callback: Callback): Promise<void> => {
-    const client = new S3Client({region: "us-east-1"});
+    const client = new S3Client({region: process.env.REGION});
     const bucket = event.Records[0].s3.bucket.name;
     const key = decodeURIComponent(event.Records[0].s3.object.key.replace(/\+/g, ' '));
     const params = {
@@ -39,7 +39,6 @@ export const importFileParser = async (event: S3Event, context: Context, callbac
         }
 
     } catch (err) {
-        console.log(err)
         console.error(`Error getting object ${key} from bucket ${bucket}.`);
         throw new Error(`Error getting object ${key} from bucket ${bucket}.`);
     }

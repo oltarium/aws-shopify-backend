@@ -13,11 +13,9 @@
     "dynamodb:startlocal": "SET AWS_SDK_LOAD_CONFIG=1 && sls dynamodb start"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.299.0",
-    "@aws-sdk/types": "^3.296.0",
-    "sinon": "^15.0.2",
     "@aws-sdk/client-dynamodb": "^3.309.0",
     "@aws-sdk/util-dynamodb": "^3.309.0",
+    "sinon": "^15.0.2",
     "@types/pg": "^8.6.6",
     "dotenv": "^16.0.3",
     "pg": "^8.10.0",

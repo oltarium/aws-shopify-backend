@@ -6,10 +6,7 @@ custom:
   webpack:
     webpackConfig: webpack.config.js
     excludeFiles: src/**/*.test.js # Provide a glob for files to ignore
-    includeModules:
-      forceExclude:
-        - aws-sdk
-  bucket: kazakuploaded
+  bucket: awsuploaded
   region: us-east-1
 
 plugins:
@@ -57,7 +54,7 @@ functions:
     events:
       - s3:
           event: s3:ObjectCreated:*
-          bucket: kazakuploaded
+          bucket: ${self:custom.bucket}
           existing: true
           rules:
             - prefix: uploaded/
