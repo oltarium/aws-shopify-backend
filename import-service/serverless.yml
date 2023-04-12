@@ -6,6 +6,9 @@ custom:
   webpack:
     webpackConfig: webpack.config.js
     excludeFiles: src/**/*.test.js # Provide a glob for files to ignore
+    includeModules:
+      forceInclude:
+        - csv-parser
   bucket: awsuploaded
   region: us-east-1
 
