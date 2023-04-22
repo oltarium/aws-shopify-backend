@@ -13,11 +13,23 @@ custom:
   DATABASE_USERNAME: ${env:DATABASE_USERNAME}
   DATABASE_PASSWORD: ${env:DATABASE_PASSWORD}
   DATABASE_NAME: ${env:DB_NAME}
-
+  dynamodb:
+    # If you only want to use DynamoDB Local in some stages, declare them here
+    stages:
+      - dev
+    start:
+      port: 6000
+      inMemory: true
+      heapInitial: 200m
+      heapMax: 1g
+      migrate: true
+      seed: true
+      convertEmptyValues: true
 plugins:
   - serverless-better-credentials
   - serverless-webpack
   - serverless-openapi-documenter
+  - serverless-dynamodb-local
 package:
   individually: true
 provider:
@@ -156,7 +168,10 @@ resources:
         KeySchema:
           - AttributeName: id
             KeyType: HASH
-        BillingMode: PAY_PER_REQUEST
+        BillingMode: PROVISIONED
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
 
     StocksTable:
       Type: AWS::DynamoDB::Table
@@ -170,4 +185,9 @@ resources:
         KeySchema:
           - AttributeName: product_id
             KeyType: HASH
-        BillingMode: PAY_PER_REQUEST
+        BillingMode: PROVISIONED
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+
+

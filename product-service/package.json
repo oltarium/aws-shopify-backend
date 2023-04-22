@@ -8,7 +8,9 @@
     "call:getProductById": "SET AWS_SDK_LOAD_CONFIG=1 && sls invoke local --function getProductById",
     "call:createProduct": "SET AWS_SDK_LOAD_CONFIG=1 && sls invoke local --function createProduct --path createProductBody.json",
     "documentation": "SET AWS_SDK_LOAD_CONFIG=1 && serverless openapi generate",
-    "initdb": "SET AWS_SDK_LOAD_CONFIG=1&& node src/initdb.mjs"
+    "initdb": "SET AWS_SDK_LOAD_CONFIG=1&& node src/initdb.mjs",
+    "dynamodb:local": "SET AWS_SDK_LOAD_CONFIG=1 && sls dynamodb install",
+    "dynamodb:startlocal": "SET AWS_SDK_LOAD_CONFIG=1 && sls dynamodb start"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.309.0",
