@@ -8,22 +8,28 @@
     "call:getProductById": "SET AWS_SDK_LOAD_CONFIG=1 && sls invoke local --function getProductById",
     "call:createProduct": "SET AWS_SDK_LOAD_CONFIG=1 && sls invoke local --function createProduct --path createProductBody.json",
     "documentation": "SET AWS_SDK_LOAD_CONFIG=1 && serverless openapi generate",
-    "initdb": "SET AWS_SDK_LOAD_CONFIG=1&& node src/initdb.mjs"
+    "initdb": "SET AWS_SDK_LOAD_CONFIG=1&& node src/initdb.mjs",
+    "dynamodb:local": "SET AWS_SDK_LOAD_CONFIG=1 && sls dynamodb install",
+    "dynamodb:startlocal": "SET AWS_SDK_LOAD_CONFIG=1 && sls dynamodb start"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.309.0",
     "@aws-sdk/util-dynamodb": "^3.309.0",
+    "sinon": "^15.0.2",
     "@types/pg": "^8.6.6",
     "dotenv": "^16.0.3",
     "pg": "^8.10.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "aws-sdk": "^2.1340.0",
+    "aws-sdk-mock": "^5.8.0",
     "aws-lambda": "^1.0.7",
     "@serverless/utils": "^6.10.0",
     "serverless-better-credentials": "^1.1.3",
     "@babel/preset-env": "^7.20.2",
     "@babel/preset-typescript": "^7.21.0",
+    "serverless-dynamodb-local": "^0.2.40",
     "serverless-openapi-documentation": "^0.4.0",
     "serverless-openapi-documenter": "0.0.48",
     "typescript": "^5.0.2",
@@ -36,6 +42,7 @@
     "@types/aws-sdk": "^2.7.0",
     "@types/jest": "^29.5.0",
     "fork-ts-checker-webpack-plugin": "^8.0.0",
+    "dynamodb-localhost": "0.0.9",
     "jest": "^29.5.0",
     "babel-loader": "^9.1.2"
   }
