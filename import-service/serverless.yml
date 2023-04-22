@@ -1,0 +1,84 @@
+service: import-service
+
+frameworkVersion: "3"
+
+custom:
+  webpack:
+    webpackConfig: webpack.config.js
+    excludeFiles: src/**/*.test.js # Provide a glob for files to ignore
+    includeModules:
+      forceInclude:
+        - csv-parser
+  bucket: awsuploaded
+  region: us-east-1
+
+plugins:
+  - serverless-better-credentials
+  - serverless-webpack
+package:
+  individually: true
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  apiGateway:
+    minimumCompressionSize: 1024
+  memorySize: 128
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLES: 1
+    REGION: ${self:custom.region}
+    BUCKET: ${self:custom.bucket}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:*
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - 'logs:CreateLogGroup'
+            - 'logs:CreateLogStream'
+            - 'logs:PutLogEvents'
+          Resource: 'arn:aws:logs:*:*:*'
+functions:
+  importProductFile:
+    handler: src/handlers/importProductsFile/handler.importProductsFile
+    events:
+      - http:
+          method: get
+          path: import
+          request:
+            parameters:
+              querystrings:
+                name: true
+  importFileParser:
+    handler: src/handlers/importFileParser/handler.importFileParser
+    events:
+      - s3:
+          event: s3:ObjectCreated:*
+          bucket: ${self:custom.bucket}
+          existing: true
+          rules:
+            - prefix: uploaded/
+
+resources:
+  Resources:
+    Uploads:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.bucket}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders:
+                - "Authorization"
+              AllowedMethods:
+                - GET
+              AllowedOrigins:
+                - "*"
+            - AllowedHeaders:
+                - "*"
+              AllowedMethods:
+                - PUT
+              AllowedOrigins:
+                - "*"
