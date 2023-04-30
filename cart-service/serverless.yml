@@ -1,0 +1,72 @@
+service: serverless-example
+
+frameworkVersion: "3"
+
+useDotenv: true
+
+custom:
+  webpack:
+    webpackConfig: webpack.config.js
+    includeModules: true
+    excludeFiles: src/**/*.test.js # Provide a glob for files to ignore
+  DATABASE_USERNAME: ${env:DATABASE_USERNAME}
+  DATABASE_PASSWORD: ${env:DATABASE_PASSWORD}
+  DATABASE_NAME: ${env:DB_NAME}
+
+plugins:
+  - serverless-better-credentials
+  - serverless-jetpack
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-east-1
+  apiGateway:
+    minimumCompressionSize: 1024
+  memorySize: 128
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLES: 1
+    POSTGRESQL_HOST: !GetAtt PostgreSqlRDSInstance.Endpoint.Address
+    POSTGRESQL_PORT: !GetAtt PostgreSqlRDSInstance.Endpoint.Port
+    DATABASE_USERNAME: ${self:custom.DATABASE_USERNAME}
+    DATABASE_PASSWORD: ${self:custom.DATABASE_PASSWORD}
+    DATABASE_NAME: ${self:custom.DATABASE_NAME}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - "rds:connect"
+            - "rds:CreateDBInstance"
+            - "rds:ModifyDBInstance"
+            - "rds:DeleteDBInstance"
+          Resource:
+            Fn::Join:
+              - ''
+              - - 'arn:aws:rds:::'
+                - Ref: PostgreSqlRDSInstance
+
+functions:
+  main:
+    handler: dist/main.handler
+    events:
+      - http:
+          method: ANY
+          path: /{proxy+}
+
+
+resources:
+  Resources:
+    PostgreSqlRDSInstance:
+      Type: AWS::RDS::DBInstance
+      DeletionPolicy: Retain
+      UpdateReplacePolicy: Retain
+      Properties:
+        MasterUsername: ${self:custom.DATABASE_USERNAME}
+        MasterUserPassword: ${self:custom.DATABASE_PASSWORD}
+        DBName: ${self:custom.DATABASE_NAME}
+        AllocatedStorage: 5
+        DBInstanceClass: db.t3.micro
+        Engine: postgres
+        PubliclyAccessible: true
