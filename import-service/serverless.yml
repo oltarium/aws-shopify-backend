@@ -11,7 +11,7 @@ custom:
         - csv-parser
   bucket: awsuploaded
   region: us-east-1
-
+  sqsName: catalogItemsQueue.fifo
 plugins:
   - serverless-better-credentials
   - serverless-webpack
@@ -41,6 +41,10 @@ provider:
             - 'logs:CreateLogStream'
             - 'logs:PutLogEvents'
           Resource: 'arn:aws:logs:*:*:*'
+        - Effect: Allow
+          Action:
+            - "sqs:SendMessage"
+          Resource: arn:aws:sqs:${aws:region}:${aws:accountId}:${self:custom.sqsName}
 functions:
   importProductFile:
     handler: src/handlers/importProductsFile/handler.importProductsFile
