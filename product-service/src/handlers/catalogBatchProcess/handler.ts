@@ -76,5 +76,10 @@ async function sendNotification(product: any) {
         Message: `New product created: Title: ${product.title}, Price: ${product.price}, Count: ${product.count}`,
         TopicArn: process.env.SNS_TOPIC
     };
-    await snsClient.send(new PublishCommand(params));
+    try {
+        await snsClient.send(new PublishCommand(params));
+    } catch (e) {
+        console.log(e);
+    }
+
 }

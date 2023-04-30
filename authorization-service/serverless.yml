@@ -1,0 +1,39 @@
+service: authorization-service
+
+frameworkVersion: "3"
+useDotenv: true
+custom:
+  webpack:
+    webpackConfig: webpack.config.js
+    includeModules: true
+plugins:
+  - serverless-better-credentials
+  - serverless-webpack
+package:
+  individually: true
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  apiGateway:
+    minimumCompressionSize: 1024
+  memorySize: 128
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLES: 1
+    oltarium: ${env:oltarium}
+functions:
+  basicAuthorizer:
+    handler: src/handlers/basicAuthorizer/handler.basicAuthorizer
+
+
+resources:
+  Resources:
+    Unauthorized:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          "gatewayresponse.header.Access-Control-Allow-Origin": "'*'"
+          "gatewayresponse.header.Access-Control-Allow-Headers": "'*'"
+        ResponseType: "DEFAULT_4XX"
+        RestApiId:
+          Ref: "ApiGatewayRestApi"
