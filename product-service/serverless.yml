@@ -190,7 +190,7 @@ resources:
     CreateProductTopicSubscription:
       Type: AWS::SNS::Subscription
       Properties:
-        Endpoint: "some11@gmail.com"
+        Endpoint: "zilian159@gmail.com"
         Protocol: "email"
         TopicArn: { "Ref": "CreateProductTopic" }
         FilterPolicyScope: MessageAttributes
@@ -199,7 +199,7 @@ resources:
     CreateProductTopicPriceSubscription:
       Type: AWS::SNS::Subscription
       Properties:
-        Endpoint: "some@gmail.com"
+        Endpoint: "zilian159@gmail.com"
         Protocol: "email"
         TopicArn: { "Ref": "CreateProductTopic" }
         FilterPolicyScope: MessageAttributes

@@ -51,7 +51,14 @@ functions:
     events:
       - http:
           method: get
+          cors: true
           path: import
+          authorizer:
+            type: token
+            name: basicAuthorizer
+            arn: arn:aws:lambda:us-east-1:492825409148:function:authorization-service-dev-basicAuthorizer
+            resultTtlInSeconds: 0
+            identitySource: method.request.header.Authorization
           request:
             parameters:
               querystrings:
@@ -68,6 +75,15 @@ functions:
 
 resources:
   Resources:
+    Unauthorized:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          "gatewayresponse.header.Access-Control-Allow-Origin": "'*'"
+          "gatewayresponse.header.Access-Control-Allow-Headers": "'*'"
+        ResponseType: "DEFAULT_4XX"
+        RestApiId:
+          Ref: "ApiGatewayRestApi"
     Uploads:
       Type: AWS::S3::Bucket
       Properties:
