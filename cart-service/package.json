@@ -20,7 +20,9 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "app": "SET AWS_SDK_LOAD_CONFIG=1 && npx serverless offline",
-    "updatedb": "npx mikro-orm schema:update --run"
+    "updatedb": "npx mikro-orm schema:update --run",
+    "deploy:import": "SET AWS_SDK_LOAD_CONFIG=1 && sls deploy",
+    "card:start": "SET AWS_SDK_LOAD_CONFIG=1 && npx serverless offline"
   },
   "dependencies": {
     "@babel/preset-env": "^7.21.4",

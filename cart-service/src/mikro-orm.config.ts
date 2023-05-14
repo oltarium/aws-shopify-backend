@@ -14,6 +14,10 @@ const config = {
   metadataProvider: ReflectMetadataProvider,
   registerRequestContext: false,
   allowGlobalContext: true,
+  migrations: {
+    path: 'dist/migrations',
+    pathTs: 'src/migrations',
+  },
 };
 
 export default config;

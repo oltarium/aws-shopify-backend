@@ -15,8 +15,9 @@ export class CartService {
   ) {}
 
   async getCard(userId: number): Promise<CardEntity> {
+    console.log('get card', typeof userId)
     return this.cardsRepository.findOne(
-      { userId: userId, status: Status.OPEN },
+      { userId: userId, status: Status.OPEN},
       { populate: ['items'] },
     );
   }

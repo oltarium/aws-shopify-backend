@@ -1,4 +1,4 @@
-import {Injectable} from '@nestjs/common';
+import {HttpException, HttpStatus, Injectable} from '@nestjs/common';
 import {User} from '../models';
 import {InjectRepository} from "@mikro-orm/nestjs";
 import {EntityRepository} from "@mikro-orm/core";
@@ -15,10 +15,13 @@ export class UsersService {
     }
 
     async login(username: string, password: string): Promise<any> {
-        const user = await this.userRepository.findOneOrFail({username, password});
+        const user = await this.userRepository.findOne({username, password});
+        if (!user) {
+            throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+        }
         let cardId;
         try {
-            const card = await this.cardService.getCard(user.id);
+            const card = await this.cardService.getCard(`${user.id}`as any as number);
             cardId = card.id;
         } catch (e) {
             cardId = await this.cardService.addCard({
@@ -42,6 +45,5 @@ export class UsersService {
         const user = await this.userRepository.create(newUser);
 
         const a = await this.userRepository.persist(user).flush();
-        ;
     }
 }

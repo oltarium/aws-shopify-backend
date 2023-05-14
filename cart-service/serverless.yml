@@ -20,7 +20,7 @@ plugins:
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs18.x
   region: us-east-1
   apiGateway:
     minimumCompressionSize: 1024
@@ -50,11 +50,14 @@ provider:
 functions:
   main:
     handler: dist/main.handler
+    timeout: 20
     events:
       - http:
           method: ANY
-          path: /{proxy+}
-
+          path: /
+      - http:
+          method: ANY
+          path: '{proxy+}'
 
 resources:
   Resources:
